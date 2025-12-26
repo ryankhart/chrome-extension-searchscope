@@ -13,8 +13,8 @@
         <img src="../icons/icon48.png" alt="Extension icon" class="header-icon">
         <h1>SearchScout</h1>
         <div class="tooltip-container">
-          <span class="info-icon">?</span>
-          <div class="tooltip">
+          <span class="info-icon" tabindex="0" role="button" aria-label="How to use this extension">?</span>
+          <div class="tooltip" role="tooltip">
             <strong>How to use:</strong> Select text on any webpage, right-click, and choose your search option from the context menu.
             <br><br>
             <strong>Smart Menu:</strong> With 1 enabled site, shows as single menu item. With 2+ sites, creates a nested submenu.
@@ -28,15 +28,15 @@
       <!-- Dynamically populated -->
     </main>
 
-    <div id="emptyState" class="empty-state hidden">
+    <div id="emptyState" class="empty-state hidden" role="status" aria-live="polite">
       <p>No search sites configured.</p>
       <p>Click + to add one.</p>
     </div>
   </div>
 
   <!-- Add/Edit Modal -->
-  <div id="modal" class="modal hidden">
-    <div class="modal-backdrop"></div>
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-backdrop" aria-hidden="true"></div>
     <div class="modal-content">
       <h2 id="modalTitle">Add Search Site</h2>
       <form id="siteForm">
