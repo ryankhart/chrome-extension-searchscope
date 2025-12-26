@@ -1,4 +1,4 @@
-import { getSearchSites, saveSearchSites, addSearchSite, updateSearchSite, deleteSearchSite, getSettings, saveSettings } from '../modules/storage.js';
+import { getSearchSites, saveSearchSites, addSearchSite, updateSearchSite, deleteSearchSite } from '../modules/storage.js';
 
 // DOM Elements
 const sitesList = document.getElementById('sitesList');
@@ -11,7 +11,6 @@ const siteName = document.getElementById('siteName');
 const siteUrl = document.getElementById('siteUrl');
 const errorMsg = document.getElementById('errorMsg');
 const cancelBtn = document.getElementById('cancelBtn');
-const flatMenuToggle = document.getElementById('flatMenuToggle');
 
 let editingId = null;
 let draggedItem = null;
@@ -21,7 +20,6 @@ let draggedItem = null;
  */
 async function init() {
   await loadSites();
-  await loadSettings();
   setupEventListeners();
 }
 
@@ -47,23 +45,6 @@ async function loadSites() {
   sites.forEach(site => {
     sitesList.appendChild(createSiteElement(site));
   });
-}
-
-/**
- * Load and apply settings
- */
-async function loadSettings() {
-  const settings = await getSettings();
-  flatMenuToggle.checked = settings.useFlatMenu || false;
-}
-
-/**
- * Handle flat menu toggle change
- */
-async function handleFlatMenuToggle() {
-  const settings = await getSettings();
-  settings.useFlatMenu = flatMenuToggle.checked;
-  await saveSettings(settings);
 }
 
 /**
@@ -120,7 +101,6 @@ function setupEventListeners() {
   cancelBtn.addEventListener('click', closeModal);
   modal.querySelector('.modal-backdrop').addEventListener('click', closeModal);
   siteForm.addEventListener('submit', handleSubmit);
-  flatMenuToggle.addEventListener('change', handleFlatMenuToggle);
 }
 
 /**
