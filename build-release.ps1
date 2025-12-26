@@ -1,3 +1,6 @@
+# NOTE: This file should be kept in sync with build-release.sh
+# When making changes, update both files to maintain feature parity
+
 # Package SearchScout extension for Chrome Web Store
 # This script creates a ZIP file containing only the runtime files
 

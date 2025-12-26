@@ -40,11 +40,15 @@ No build step required - this is vanilla JavaScript with ES6 modules. To test ch
 
 To package the extension for Chrome Web Store distribution:
 
-```powershell
-.\package.ps1
+```bash
+# Linux/macOS
+./build-release.sh
+
+# Windows (PowerShell)
+.\build-release.ps1
 ```
 
-Creates `SearchScout-1.0.0.zip` with only runtime files (excludes development files, screenshots, etc.). When updating the version, ensure the version number matches in both [manifest.json](manifest.json#L4) and [package.ps1](package.ps1#L5).
+Creates `SearchScout-1.0.0.zip` with only runtime files (excludes development files, screenshots, etc.). When updating the version, ensure the version number matches in both [manifest.json](manifest.json#L4) and [build-release.ps1](build-release.ps1#L8).
 
 ## Store Listing Images
 
