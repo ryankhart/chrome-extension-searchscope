@@ -424,3 +424,154 @@ body {
 .hidden {
   display: none !important;
 }
+
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #202124;
+    color: #e8eaed;
+  }
+
+  .header {
+    background: #292a2d;
+    border-bottom-color: #5f6368;
+  }
+
+  .header h1 {
+    color: #e8eaed;
+  }
+
+  .info-icon {
+    background: #5f6368;
+  }
+
+  .info-icon:hover {
+    background: #80868b;
+  }
+
+  .tooltip {
+    background: #5f6368;
+  }
+
+  .tooltip::before {
+    border-bottom-color: #5f6368;
+  }
+
+  .settings-section {
+    background: #292a2d;
+    border-bottom-color: #5f6368;
+  }
+
+  .setting-label {
+    color: #e8eaed;
+  }
+
+  .setting-description {
+    color: #9aa0a6;
+  }
+
+  .site-item:hover {
+    background: #292a2d;
+  }
+
+  .site-item.dragging {
+    background: #1a4d7a;
+  }
+
+  .drag-handle {
+    color: #9aa0a6;
+  }
+
+  .site-name {
+    color: #e8eaed;
+  }
+
+  .site-url {
+    color: #9aa0a6;
+  }
+
+  .toggle-slider {
+    background-color: #5f6368;
+  }
+
+  .btn-action {
+    color: #9aa0a6;
+  }
+
+  .btn-action:hover {
+    background: #5f6368;
+    color: #e8eaed;
+  }
+
+  .btn-action.delete:hover {
+    background: #5f2120;
+    color: #f28b82;
+  }
+
+  .btn-action:disabled {
+    color: #5f6368;
+  }
+
+  .btn-action:disabled:hover {
+    background: transparent;
+  }
+
+  .empty-state {
+    color: #9aa0a6;
+  }
+
+  .modal-backdrop {
+    background: rgba(0, 0, 0, 0.7);
+  }
+
+  .modal-content {
+    background: #292a2d;
+  }
+
+  .modal-content h2 {
+    color: #e8eaed;
+  }
+
+  .form-group label {
+    color: #e8eaed;
+  }
+
+  .form-group input {
+    background: #202124;
+    border-color: #5f6368;
+    color: #e8eaed;
+  }
+
+  .form-group input:focus {
+    border-color: #8ab4f8;
+    box-shadow: 0 0 0 2px rgba(138, 180, 248, 0.2);
+  }
+
+  .hint {
+    color: #9aa0a6;
+  }
+
+  .error {
+    background: #5f2120;
+    color: #f28b82;
+  }
+
+  .btn-primary {
+    background: #8ab4f8;
+    color: #202124;
+  }
+
+  .btn-primary:hover {
+    background: #aecbfa;
+  }
+
+  .btn-secondary {
+    background: #292a2d;
+    color: #8ab4f8;
+    border-color: #5f6368;
+  }
+
+  .btn-secondary:hover {
+    background: #3c4043;
+  }
+}
