@@ -6,6 +6,13 @@ Search selected text across multiple engines.
 
 A Chrome extension that adds a right-click context menu to search selected text across multiple customizable search engines.
 
+## Screenshots
+
+![Multiple search engines in context menu](screenshots/store-listing/4-context-menu-multiple.png)
+![Quick search from context menu](screenshots/store-listing/3-context-menu-single.png)
+![Dark theme popup](screenshots/store-listing/1-popup-dark.png)
+![Light theme popup](screenshots/store-listing/2-popup-light.png)
+
 ## Features
 
 - **Right-click search**: Select any text on a webpage and search it instantly
