@@ -5,10 +5,15 @@
 # Package SearchScout extension for Chrome Web Store
 # This script creates a ZIP file containing only the runtime files
 
-extensionName="SearchScout"
-version="1.0.0"
+# Read version from manifest.json
+# Using grep and sed for cross-platform compatibility (doesn't require jq)
+extensionName=$(grep '"name"' manifest.json | sed -E 's/.*"name"[[:space:]]*:[[:space:]]*"([^"]+)".*/\1/')
+version=$(grep '"version"' manifest.json | sed -E 's/.*"version"[[:space:]]*:[[:space:]]*"([^"]+)".*/\1/')
 outputFile="${extensionName}-${version}.zip"
 tempDir="temp-package"
+
+echo "Building release package for $extensionName v$version"
+echo ""
 
 # Remove old package and temp directory if they exist
 if [ -f "$outputFile" ]; then
@@ -19,9 +24,6 @@ fi
 if [ -d "$tempDir" ]; then
     rm -rf "$tempDir"
 fi
-
-echo "Creating package: $outputFile"
-echo ""
 
 # Create temporary directory structure
 mkdir -p "$tempDir/icons"

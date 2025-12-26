@@ -48,7 +48,7 @@ To package the extension for Chrome Web Store distribution:
 .\build-release.ps1
 ```
 
-Creates `SearchScout-1.0.0.zip` with only runtime files (excludes development files, screenshots, etc.). When updating the version, ensure the version number matches in both [manifest.json](manifest.json#L4) and [build-release.ps1](build-release.ps1#L8).
+Creates a versioned ZIP file (e.g., `SearchScout-1.0.0.zip`) with only runtime files (excludes development files, screenshots, etc.). The version number is automatically read from [manifest.json](manifest.json#L4), so you only need to update it in one place.
 
 ## Store Listing Images
 

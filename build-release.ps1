@@ -4,10 +4,15 @@
 # Package SearchScout extension for Chrome Web Store
 # This script creates a ZIP file containing only the runtime files
 
-$extensionName = "SearchScout"
-$version = "1.0.0"
+# Read version from manifest.json
+$manifest = Get-Content "manifest.json" -Raw | ConvertFrom-Json
+$extensionName = $manifest.name
+$version = $manifest.version
 $outputFile = "$extensionName-$version.zip"
 $tempDir = "temp-package"
+
+Write-Host "Building release package for $extensionName v$version"
+Write-Host ""
 
 # Remove old package and temp directory if they exist
 if (Test-Path $outputFile) {
@@ -18,9 +23,6 @@ if (Test-Path $outputFile) {
 if (Test-Path $tempDir) {
     Remove-Item -Recurse -Force $tempDir
 }
-
-Write-Host "Creating package: $outputFile"
-Write-Host ""
 
 # Create temporary directory structure
 New-Item -ItemType Directory -Path $tempDir | Out-Null
