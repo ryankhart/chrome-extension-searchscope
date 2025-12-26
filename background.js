@@ -13,13 +13,13 @@ async function createContextMenu() {
   }
   isCreatingMenu = true;
 
-  // Remove all existing menus first
-  try {
-    await chrome.contextMenus.removeAll();
-    console.log('Removed all context menus');
-  } catch (error) {
-    console.error('Error removing menus:', error);
-  }
+  // Remove all existing menus first - use callback to ensure completion
+  await new Promise((resolve) => {
+    chrome.contextMenus.removeAll(() => {
+      console.log('Removed all context menus');
+      resolve();
+    });
+  });
 
   const settings = await getSettings();
   const sites = await getEnabledSearchSites();
