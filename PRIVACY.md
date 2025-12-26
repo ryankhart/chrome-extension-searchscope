@@ -46,7 +46,7 @@ If we make changes to this privacy policy, we will update the effective date at 
 ## Contact
 
 If you have questions about this privacy policy, please open an issue on our GitHub repository:
-https://github.com/ryankhart/chrome-extension-searchscope
+https://github.com/ryankhart/chrome-extension-searchscout
 
 ## License
 
