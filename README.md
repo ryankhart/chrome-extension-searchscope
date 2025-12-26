@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="icons/icon128.png" alt="SearchScout Icon" width="128" height="128">
+</p>
+
 # SearchScout
 
 Search selected text across multiple engines.
