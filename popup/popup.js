@@ -57,18 +57,18 @@ function createSiteElement(site) {
   div.draggable = true;
 
   div.innerHTML = `
-    <span class="drag-handle" title="Drag to reorder">&#8942;&#8942;</span>
+    <span class="drag-handle" title="Drag to reorder" aria-label="Drag to reorder" aria-hidden="true">&#8942;&#8942;</span>
     <div class="site-info">
       <div class="site-name">${escapeHtml(site.name)}</div>
       <div class="site-url">${escapeHtml(site.url)}</div>
     </div>
     <div class="site-actions">
-      <label class="toggle" title="${site.enabled ? 'Disable' : 'Enable'}">
-        <input type="checkbox" ${site.enabled ? 'checked' : ''}>
-        <span class="toggle-slider"></span>
+      <label class="toggle" title="${site.enabled ? 'Disable' : 'Enable'}" aria-label="Toggle ${escapeHtml(site.name)}">
+        <input type="checkbox" ${site.enabled ? 'checked' : ''} aria-label="Enable ${escapeHtml(site.name)}">
+        <span class="toggle-slider" aria-hidden="true"></span>
       </label>
-      <button class="btn-action edit" title="Edit">&#9998;</button>
-      <button class="btn-action delete" title="Delete" ${site.isDefault ? 'disabled' : ''}>&#10005;</button>
+      <button class="btn-action edit" title="Edit" aria-label="Edit ${escapeHtml(site.name)}">&#9998;</button>
+      <button class="btn-action delete" title="Delete" aria-label="Delete ${escapeHtml(site.name)}" ${site.isDefault ? 'disabled' : ''}>&#10005;</button>
     </div>
   `;
 
@@ -101,6 +101,13 @@ function setupEventListeners() {
   cancelBtn.addEventListener('click', closeModal);
   modal.querySelector('.modal-backdrop').addEventListener('click', closeModal);
   siteForm.addEventListener('submit', handleSubmit);
+
+  // Keyboard navigation for info icon
+  const infoIcon = document.querySelector('.info-icon');
+  infoIcon.addEventListener('keydown', handleInfoIconKeyboard);
+
+  // Escape key to close modal
+  document.addEventListener('keydown', handleEscapeKey);
 }
 
 /**
@@ -307,6 +314,26 @@ function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
+}
+
+/**
+ * Handle keyboard navigation for info icon (Enter/Space to toggle tooltip)
+ */
+function handleInfoIconKeyboard(e) {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    const tooltip = e.currentTarget.nextElementSibling;
+    tooltip.classList.toggle('visible');
+  }
+}
+
+/**
+ * Handle Escape key to close modal
+ */
+function handleEscapeKey(e) {
+  if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+    closeModal();
+  }
 }
 
 // Initialize when DOM is ready
