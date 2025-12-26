@@ -68,7 +68,36 @@ def add_rounded_corners(img, radius=20):
 
     return output
 
-def create_store_image(screenshot_path, output_path, title=None):
+def draw_annotation(draw, text, x, y, font, align='left'):
+    """Draw text annotation with background box"""
+    # Get text size
+    bbox = draw.textbbox((0, 0), text, font=font)
+    text_width = bbox[2] - bbox[0]
+    text_height = bbox[3] - bbox[1]
+
+    padding = 15
+    box_width = text_width + padding * 2
+    box_height = text_height + padding * 2
+
+    if align == 'right':
+        box_x = x - box_width
+    else:
+        box_x = x
+
+    box_y = y - padding
+
+    # Draw semi-transparent background box with rounded corners
+    box = Image.new('RGBA', (box_width, box_height), (0, 0, 0, 0))
+    box_draw = ImageDraw.Draw(box)
+    box_draw.rounded_rectangle(
+        [(0, 0), (box_width, box_height)],
+        radius=8,
+        fill=(0, 0, 0, 200)
+    )
+
+    return box, box_x, box_y, text_width, text_height, padding
+
+def create_store_image(screenshot_path, output_path, annotation=None, annotation_position='right'):
     """Create a professional store listing image from a screenshot"""
     print(f"Processing: {screenshot_path}")
 
@@ -87,57 +116,105 @@ def create_store_image(screenshot_path, output_path, title=None):
     background = create_gradient_background(OUTPUT_WIDTH, OUTPUT_HEIGHT)
     background = background.convert('RGBA')
 
-    # Calculate position to center screenshot (accounting for shadow)
-    title_height = 60 if title else 0
-    available_height = OUTPUT_HEIGHT - PADDING * 2 - title_height
+    # Reserve space for annotation on the side
+    annotation_width = 280 if annotation else 0
 
-    # Scale screenshot to fit while maintaining aspect ratio
-    screenshot_aspect = screenshot.width / screenshot.height
-    max_width = OUTPUT_WIDTH - PADDING * 2
-    max_height = available_height
+    # Calculate maximum size for screenshot
+    max_width = OUTPUT_WIDTH - PADDING * 2 - annotation_width - (40 if annotation else 0)
+    max_height = OUTPUT_HEIGHT - PADDING * 2
 
-    if screenshot.width > max_width or screenshot.height > max_height:
-        # Scale down to fit
-        scale = min(max_width / screenshot.width, max_height / screenshot.height)
-        # Add some extra scaling to make it look nice (not too big)
-        scale *= 0.8
-        new_width = int(screenshot.width * scale)
-        new_height = int(screenshot.height * scale)
-        screenshot_with_shadow = screenshot_with_shadow.resize(
-            (int(screenshot_with_shadow.width * scale),
-             int(screenshot_with_shadow.height * scale)),
-            Image.Resampling.LANCZOS
-        )
+    # Scale screenshot to be as large as possible while fitting
+    scale = min(max_width / screenshot.width, max_height / screenshot.height)
+    # Use 95% of available space for a bit of breathing room
+    scale *= 0.95
 
-    # Center the screenshot with shadow
-    x = (OUTPUT_WIDTH - screenshot_with_shadow.width) // 2
-    y = (OUTPUT_HEIGHT - screenshot_with_shadow.height - title_height) // 2 + title_height // 2
+    screenshot_with_shadow = screenshot_with_shadow.resize(
+        (int(screenshot_with_shadow.width * scale),
+         int(screenshot_with_shadow.height * scale)),
+        Image.Resampling.LANCZOS
+    )
+
+    # Position screenshot (offset to make room for annotation)
+    if annotation_position == 'right':
+        x = PADDING
+    else:
+        x = PADDING + annotation_width + 40
+
+    y = (OUTPUT_HEIGHT - screenshot_with_shadow.height) // 2
 
     # Composite screenshot onto background
     background.paste(screenshot_with_shadow, (x, y), screenshot_with_shadow)
 
-    # Add title if provided
-    if title:
+    # Add annotation if provided
+    if annotation:
         draw = ImageDraw.Draw(background)
+
+        # Load fonts
         try:
-            font = ImageFont.truetype("segoeui.ttf", 36)
+            title_font = ImageFont.truetype("segoeui.ttf", 42)
+            subtitle_font = ImageFont.truetype("segoeui.ttf", 24)
         except:
             try:
-                font = ImageFont.truetype("arial.ttf", 36)
+                title_font = ImageFont.truetype("arial.ttf", 42)
+                subtitle_font = ImageFont.truetype("arial.ttf", 24)
             except:
-                font = ImageFont.load_default()
+                title_font = ImageFont.load_default()
+                subtitle_font = ImageFont.load_default()
 
-        # Get text bounding box
-        bbox = draw.textbbox((0, 0), title, font=font)
-        text_width = bbox[2] - bbox[0]
-        text_height = bbox[3] - bbox[1]
+        # Parse annotation (title and optional subtitle)
+        if isinstance(annotation, dict):
+            title = annotation.get('title', '')
+            subtitle = annotation.get('subtitle', '')
+        else:
+            title = annotation
+            subtitle = ''
 
-        text_x = (OUTPUT_WIDTH - text_width) // 2
-        text_y = PADDING // 2
+        # Calculate annotation position
+        if annotation_position == 'right':
+            ann_x = x + screenshot_with_shadow.width + 40
+        else:
+            ann_x = PADDING
 
-        # Draw text with subtle shadow
-        draw.text((text_x + 2, text_y + 2), title, fill=(0, 0, 0, 100), font=font)
-        draw.text((text_x, text_y), title, fill=(255, 255, 255, 255), font=font)
+        ann_y = OUTPUT_HEIGHT // 2 - 60
+
+        # Draw title
+        title_bbox = draw.textbbox((0, 0), title, font=title_font)
+        title_width = title_bbox[2] - title_bbox[0]
+
+        # Draw title with shadow
+        draw.text((ann_x + 2, ann_y + 2), title, fill=(0, 0, 0, 150), font=title_font)
+        draw.text((ann_x, ann_y), title, fill=(255, 255, 255, 255), font=title_font)
+
+        # Draw subtitle if provided
+        if subtitle:
+            sub_y = ann_y + 60
+            # Word wrap subtitle
+            words = subtitle.split()
+            lines = []
+            current_line = []
+            max_width = annotation_width - 20
+
+            for word in words:
+                current_line.append(word)
+                test_line = ' '.join(current_line)
+                bbox = draw.textbbox((0, 0), test_line, font=subtitle_font)
+                if bbox[2] - bbox[0] > max_width:
+                    if len(current_line) > 1:
+                        current_line.pop()
+                        lines.append(' '.join(current_line))
+                        current_line = [word]
+                    else:
+                        lines.append(word)
+                        current_line = []
+
+            if current_line:
+                lines.append(' '.join(current_line))
+
+            # Draw wrapped lines
+            for i, line in enumerate(lines):
+                line_y = sub_y + i * 35
+                draw.text((ann_x + 2, line_y + 2), line, fill=(0, 0, 0, 100), font=subtitle_font)
+                draw.text((ann_x, line_y), line, fill=(200, 200, 200, 255), font=subtitle_font)
 
     # Convert back to RGB for saving
     final = Image.new('RGB', background.size, BACKGROUND_COLOR)
@@ -155,20 +232,52 @@ def main():
     # Create output directory
     os.makedirs(output_dir, exist_ok=True)
 
-    # Define screenshots and their titles
+    # Define screenshots with annotations
     images = [
-        ("Screenshot 2025-12-25 215031.png", "1-popup-dark.png", "Manage Your Search Engines"),
-        ("Screenshot 2025-12-25 215243.png", "2-popup-light.png", "Light Theme Support"),
-        ("Screenshot 2025-12-25 220054.png", "3-context-menu-single.png", "Right-Click to Search"),
-        ("Screenshot 2025-12-25 220209.png", "4-context-menu-multiple.png", "Multiple Search Options"),
+        (
+            "Screenshot 2025-12-25 215031.png",
+            "1-popup-dark.png",
+            {
+                'title': 'Dark Theme',
+                'subtitle': 'Manage search engines with a sleek dark interface'
+            },
+            'right'
+        ),
+        (
+            "Screenshot 2025-12-25 215243.png",
+            "2-popup-light.png",
+            {
+                'title': 'Light Theme',
+                'subtitle': 'Automatic theme switching to match your preferences'
+            },
+            'right'
+        ),
+        (
+            "Screenshot 2025-12-25 220054.png",
+            "3-context-menu-single.png",
+            {
+                'title': 'Quick Search',
+                'subtitle': 'Right-click selected text to search instantly'
+            },
+            'right'
+        ),
+        (
+            "Screenshot 2025-12-25 220209.png",
+            "4-context-menu-multiple.png",
+            {
+                'title': 'Multiple Engines',
+                'subtitle': 'Choose from all your enabled search engines'
+            },
+            'right'
+        ),
     ]
 
-    for screenshot_name, output_name, title in images:
+    for screenshot_name, output_name, annotation, position in images:
         screenshot_path = os.path.join(screenshots_dir, screenshot_name)
         output_path = os.path.join(output_dir, output_name)
 
         if os.path.exists(screenshot_path):
-            create_store_image(screenshot_path, output_path, title)
+            create_store_image(screenshot_path, output_path, annotation, position)
         else:
             print(f"Warning: {screenshot_path} not found")
 
