@@ -2,6 +2,7 @@ import { initializeStorage, getEnabledSearchSites } from './modules/storage.js';
 
 const PARENT_MENU_ID = 'custom-search-parent';
 let isCreatingMenu = false;
+let createMenuTimeout = null;
 
 /**
  * Create context menu with all enabled search sites
@@ -37,6 +38,10 @@ async function createContextMenu() {
       id: site.id,
       title: `Search ${site.name} for "%s"`,
       contexts: ['selection']
+    }, () => {
+      if (chrome.runtime.lastError) {
+        console.error('Failed to create context menu:', chrome.runtime.lastError);
+      }
     });
   } else {
     // Multiple sites: Create nested menu
@@ -45,6 +50,10 @@ async function createContextMenu() {
       id: PARENT_MENU_ID,
       title: 'Search for "%s"',
       contexts: ['selection']
+    }, () => {
+      if (chrome.runtime.lastError) {
+        console.error('Failed to create parent menu:', chrome.runtime.lastError);
+      }
     });
 
     for (const site of sites) {
@@ -53,6 +62,10 @@ async function createContextMenu() {
         parentId: PARENT_MENU_ID,
         title: site.name,
         contexts: ['selection']
+      }, () => {
+        if (chrome.runtime.lastError) {
+          console.error('Failed to create menu item:', chrome.runtime.lastError);
+        }
       });
     }
   }
@@ -73,7 +86,11 @@ chrome.contextMenus.onClicked.addListener(async (info) => {
     if (site && info.selectionText) {
       const searchText = encodeURIComponent(info.selectionText);
       const searchUrl = site.url.replace('%s', searchText);
-      chrome.tabs.create({ url: searchUrl });
+      chrome.tabs.create({ url: searchUrl }, (tab) => {
+        if (chrome.runtime.lastError) {
+          console.error('Failed to open search tab:', chrome.runtime.lastError);
+        }
+      });
     }
   }
 });
@@ -87,11 +104,15 @@ chrome.runtime.onInstalled.addListener(async () => {
 });
 
 /**
- * Rebuild context menu when storage changes
+ * Rebuild context menu when storage changes (debounced to prevent race conditions)
  */
 chrome.storage.onChanged.addListener((changes, areaName) => {
   if (areaName === 'sync' && changes.searchSites) {
-    createContextMenu();
+    // Debounce menu creation to handle rapid storage changes
+    clearTimeout(createMenuTimeout);
+    createMenuTimeout = setTimeout(() => {
+      createContextMenu();
+    }, 300);
   }
 });
 
