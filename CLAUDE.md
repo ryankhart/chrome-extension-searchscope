@@ -35,3 +35,23 @@ No build step required - this is vanilla JavaScript with ES6 modules. To test ch
 
 - `contextMenus` - Right-click menu creation
 - `storage` - Chrome sync storage for cross-device settings
+
+## Packaging
+
+To package the extension for Chrome Web Store distribution:
+
+```powershell
+.\package.ps1
+```
+
+Creates `SearchScout-1.0.0.zip` with only runtime files (excludes development files, screenshots, etc.). When updating the version, ensure the version number matches in both [manifest.json](manifest.json#L4) and [package.ps1](package.ps1#L5).
+
+## Store Listing Images
+
+To generate promotional screenshots for the Chrome Web Store:
+
+```bash
+python create-store-images.py
+```
+
+Processes raw screenshots from `screenshots/` directory and creates polished 1280x800px images in `screenshots/store-listing/` with gradients, shadows, rounded corners, and annotations. Requires Python 3 with Pillow (PIL).
