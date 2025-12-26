@@ -10,17 +10,36 @@ function Create-Icon {
     # Blue background
     $graphics.Clear([System.Drawing.Color]::FromArgb(26, 115, 232))
 
-    # Draw magnifying glass circle
-    $penWidth = [Math]::Max(1, $size / 12)
-    $pen = New-Object System.Drawing.Pen([System.Drawing.Color]::White, $penWidth)
-    $circleSize = $size * 0.5
-    $circleOffset = $size * 0.15
-    $graphics.DrawEllipse($pen, $circleOffset, $circleOffset, $circleSize, $circleSize)
+    # Calculate dimensions
+    $lensRadius = $size * 0.18
+    $lensDiameter = $lensRadius * 2
+    $strokeWidth = [Math]::Max(2, $size / 14)
+    $bridgeHeight = [Math]::Max(3, $size * 0.08)
 
-    # Draw handle
-    $handleStart = $circleOffset + $circleSize * 0.75
-    $handleEnd = $size * 0.85
-    $graphics.DrawLine($pen, $handleStart, $handleStart, $handleEnd, $handleEnd)
+    # Left lens center at (35%, 50%)
+    $leftX = $size * 0.35 - $lensRadius
+    $leftY = $size * 0.50 - $lensRadius
+
+    # Right lens center at (65%, 50%)
+    $rightX = $size * 0.65 - $lensRadius
+    $rightY = $size * 0.50 - $lensRadius
+
+    # Draw white lens outlines
+    $whitePen = New-Object System.Drawing.Pen([System.Drawing.Color]::White, $strokeWidth)
+    $whitePen.StartCap = 'Round'
+    $whitePen.EndCap = 'Round'
+    $graphics.DrawEllipse($whitePen, $leftX, $leftY, $lensDiameter, $lensDiameter)
+    $graphics.DrawEllipse($whitePen, $rightX, $rightY, $lensDiameter, $lensDiameter)
+
+    # Draw orange bridge connecting the lenses
+    $orangeBrush = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(255, 107, 53))
+    $bridgeX = $size * 0.35 + $lensRadius
+    $bridgeY = $size * 0.50 - ($bridgeHeight / 2)
+    $bridgeWidth = ($size * 0.65) - ($size * 0.35) - ($lensRadius * 2)
+    $graphics.FillRectangle($orangeBrush, $bridgeX, $bridgeY, $bridgeWidth, $bridgeHeight)
+
+    $whitePen.Dispose()
+    $orangeBrush.Dispose()
 
     $graphics.Dispose()
     $bitmap.Save($path, [System.Drawing.Imaging.ImageFormat]::Png)
