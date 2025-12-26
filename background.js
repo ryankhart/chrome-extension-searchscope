@@ -1,13 +1,20 @@
 import { initializeStorage, getEnabledSearchSites, getSettings } from './modules/storage.js';
 
 const PARENT_MENU_ID = 'custom-search-parent';
+let isCreatingMenu = false;
 
 /**
  * Create context menu with all enabled search sites
  */
 async function createContextMenu() {
+  if (isCreatingMenu) return;
+  isCreatingMenu = true;
   // Remove all existing menus first
-  await chrome.contextMenus.removeAll();
+  try {
+    await chrome.contextMenus.removeAll();
+  } catch (error) {
+    console.error('Error removing menus:', error);
+  }
 
   const settings = await getSettings();
   const sites = await getEnabledSearchSites();
@@ -38,6 +45,8 @@ async function createContextMenu() {
       });
     }
   }
+
+  isCreatingMenu = false;
 }
 
 /**
