@@ -1,4 +1,5 @@
 import { getSearchSites, saveSearchSites, addSearchSite, updateSearchSite, deleteSearchSite } from '../modules/storage.js';
+import { MAX_NAME_LENGTH, PLACEHOLDER_TOKEN } from '../modules/config.js';
 
 // DOM Elements
 const sitesList = document.getElementById('sitesList');
@@ -16,9 +17,20 @@ let editingId = null;
 let draggedItem = null;
 
 /**
+ * Get all site DOM elements from the list
+ * @returns {HTMLElement[]} Array of site item elements
+ */
+function getSiteElements() {
+  return [...sitesList.querySelectorAll('.site-item')];
+}
+
+/**
  * Initialize popup
  */
 async function init() {
+  // Set maxlength from config
+  siteName.maxLength = MAX_NAME_LENGTH;
+
   await loadSites();
   setupEventListeners();
 }
@@ -178,7 +190,7 @@ async function handleSubmit(e) {
  */
 function validateSite(name, url) {
   if (!name) return 'Name is required.';
-  if (name.length > 50) return 'Name must be 50 characters or less.';
+  if (name.length > MAX_NAME_LENGTH) return `Name must be ${MAX_NAME_LENGTH} characters or less.`;
   if (!url) return 'URL is required.';
 
   // Check URL format
@@ -193,13 +205,14 @@ function validateSite(name, url) {
     return 'URL must start with http:// or https://';
   }
 
-  // Check for %s placeholder
-  const placeholderCount = (url.match(/%s/g) || []).length;
+  // Check for placeholder token
+  const placeholderRegex = new RegExp(PLACEHOLDER_TOKEN.replace('%', '\\%'), 'g');
+  const placeholderCount = (url.match(placeholderRegex) || []).length;
   if (placeholderCount === 0) {
-    return 'URL must contain %s placeholder for search term.';
+    return `URL must contain ${PLACEHOLDER_TOKEN} placeholder for search term.`;
   }
   if (placeholderCount > 1) {
-    return 'URL should contain only one %s placeholder.';
+    return `URL should contain only one ${PLACEHOLDER_TOKEN} placeholder.`;
   }
 
   return null;
@@ -281,7 +294,7 @@ async function handleDrop(e) {
  * Update order after drag and drop
  */
 async function updateOrder() {
-  const items = [...sitesList.querySelectorAll('.site-item')];
+  const items = getSiteElements();
   const sites = await getSearchSites();
 
   items.forEach((item, index) => {
