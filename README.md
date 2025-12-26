@@ -64,31 +64,6 @@ Example URLs:
 - Amazon: `https://www.amazon.com/s?k=%s`
 - MDN: `https://developer.mozilla.org/en-US/search?q=%s`
 
-## Development
-
-### Project Structure
-
-```
-chrome-extension-searchscope/
-├── manifest.json          # Extension configuration
-├── background.js          # Service worker for context menus
-├── popup/
-│   ├── popup.html         # Popup UI
-│   ├── popup.css          # Popup styling
-│   └── popup.js           # Popup logic
-├── modules/
-│   ├── storage.js         # Storage abstraction
-│   └── defaults.js        # Default search engines
-└── icons/                 # Extension icons
-```
-
-### Technologies
-
-- Manifest V3
-- Chrome Storage Sync API
-- Chrome Context Menus API
-- ES6 Modules
-
 ## Attribution
 
 <a href="https://www.flaticon.com/free-icons/binoculars" title="binoculars icons">Extension icon created by smashingstocks - Flaticon</a>
