@@ -16,7 +16,9 @@ BACKGROUND_COLOR = (45, 55, 72)  # Slate blue-gray
 ACCENT_COLOR = (59, 130, 246)    # Blue accent
 SHADOW_OFFSET = 15
 SHADOW_BLUR = 30
-PADDING = 80
+PADDING = 60  # Reduced padding for larger screenshots
+ANNOTATION_WIDTH = 240  # Reduced annotation width
+GAP = 50  # Gap between screenshot and annotation
 
 def create_gradient_background(width, height):
     """Create a subtle gradient background"""
@@ -116,17 +118,15 @@ def create_store_image(screenshot_path, output_path, annotation=None, annotation
     background = create_gradient_background(OUTPUT_WIDTH, OUTPUT_HEIGHT)
     background = background.convert('RGBA')
 
-    # Reserve space for annotation on the side
-    annotation_width = 280 if annotation else 0
-
-    # Calculate maximum size for screenshot
-    max_width = OUTPUT_WIDTH - PADDING * 2 - annotation_width - (40 if annotation else 0)
+    # Calculate available space for screenshot
+    reserved_space = ANNOTATION_WIDTH + GAP if annotation else 0
+    max_width = OUTPUT_WIDTH - PADDING * 2 - reserved_space
     max_height = OUTPUT_HEIGHT - PADDING * 2
 
     # Scale screenshot to be as large as possible while fitting
     scale = min(max_width / screenshot.width, max_height / screenshot.height)
-    # Use 95% of available space for a bit of breathing room
-    scale *= 0.95
+    # Use 98% of available space for minimal breathing room
+    scale *= 0.98
 
     screenshot_with_shadow = screenshot_with_shadow.resize(
         (int(screenshot_with_shadow.width * scale),
@@ -134,11 +134,15 @@ def create_store_image(screenshot_path, output_path, annotation=None, annotation
         Image.Resampling.LANCZOS
     )
 
-    # Position screenshot (offset to make room for annotation)
+    # Center the entire screenshot+annotation combo
+    total_width = screenshot_with_shadow.width + (reserved_space if annotation else 0)
+    combo_start_x = (OUTPUT_WIDTH - total_width) // 2
+
+    # Position screenshot
     if annotation_position == 'right':
-        x = PADDING
+        x = combo_start_x
     else:
-        x = PADDING + annotation_width + 40
+        x = combo_start_x + ANNOTATION_WIDTH + GAP
 
     y = (OUTPUT_HEIGHT - screenshot_with_shadow.height) // 2
 
@@ -171,9 +175,9 @@ def create_store_image(screenshot_path, output_path, annotation=None, annotation
 
         # Calculate annotation position
         if annotation_position == 'right':
-            ann_x = x + screenshot_with_shadow.width + 40
+            ann_x = x + screenshot_with_shadow.width + GAP
         else:
-            ann_x = PADDING
+            ann_x = combo_start_x
 
         ann_y = OUTPUT_HEIGHT // 2 - 60
 
@@ -192,7 +196,7 @@ def create_store_image(screenshot_path, output_path, annotation=None, annotation
             words = subtitle.split()
             lines = []
             current_line = []
-            max_width = annotation_width - 20
+            max_width = ANNOTATION_WIDTH - 20
 
             for word in words:
                 current_line.append(word)
