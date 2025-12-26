@@ -87,7 +87,7 @@ chrome-extension-searchscope/
 
 ## Attribution
 
-Extension icon by [Flaticon](https://www.flaticon.com/free-icon/binoculars_7395155)
+<a href="https://www.flaticon.com/free-icons/binoculars" title="binoculars icons">Extension icon created by smashingstocks - Flaticon</a>
 
 ## License
 
