@@ -85,6 +85,10 @@ chrome-extension-searchscope/
 - Chrome Context Menus API
 - ES6 Modules
 
+## Attribution
+
+Extension icon by [Flaticon](https://www.flaticon.com/free-icon/binoculars_7395155)
+
 ## License
 
 MIT
