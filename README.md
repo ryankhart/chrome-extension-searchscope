@@ -1,6 +1,4 @@
-<p align="center">
-  <img src="icons/icon128.png" alt="SearchScout Icon" width="128" height="128">
-</p>
+![SearchScout Icon](icons/icon128.png)
 
 # SearchScout
 
