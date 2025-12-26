@@ -1,6 +1,15 @@
 import { DEFAULT_SEARCH_SITES } from './defaults.js';
+import { STORAGE_KEY } from './config.js';
 
-const STORAGE_KEY = 'searchSites';
+/**
+ * Find the index of a site by its ID
+ * @param {Array} sites - Array of search site objects
+ * @param {string} id - Site ID to find
+ * @returns {number} Index of the site, or -1 if not found
+ */
+function findSiteIndex(sites, id) {
+  return sites.findIndex(site => site.id === id);
+}
 
 /**
  * Get all search sites from storage
@@ -52,12 +61,15 @@ export async function addSearchSite(site) {
  * Update an existing search site
  * @param {string} id - Site id to update
  * @param {Object} updates - Fields to update
- * @returns {Promise<Object|null>} Updated site or null if not found
+ * @returns {Promise<Object>} Updated site
+ * @throws {Error} If site with given id is not found
  */
 export async function updateSearchSite(id, updates) {
   const sites = await getSearchSites();
-  const index = sites.findIndex(site => site.id === id);
-  if (index === -1) return null;
+  const index = findSiteIndex(sites, id);
+  if (index === -1) {
+    throw new Error(`Site with id ${id} not found`);
+  }
 
   sites[index] = { ...sites[index], ...updates };
   await saveSearchSites(sites);
@@ -67,18 +79,20 @@ export async function updateSearchSite(id, updates) {
 /**
  * Delete a search site
  * @param {string} id - Site id to delete
- * @returns {Promise<boolean>} True if deleted, false if not found
+ * @returns {Promise<void>}
+ * @throws {Error} If site with given id is not found
  */
 export async function deleteSearchSite(id) {
   const sites = await getSearchSites();
-  const index = sites.findIndex(site => site.id === id);
-  if (index === -1) return false;
+  const index = findSiteIndex(sites, id);
+  if (index === -1) {
+    throw new Error(`Site with id ${id} not found`);
+  }
 
   sites.splice(index, 1);
   // Reorder remaining sites
   sites.forEach((site, i) => site.order = i);
   await saveSearchSites(sites);
-  return true;
 }
 
 /**
