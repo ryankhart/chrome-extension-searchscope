@@ -1,4 +1,4 @@
-import { initializeStorage, getEnabledSearchSites } from './modules/storage.js';
+import { initializeStorage, getEnabledSearchSites, getSettings } from './modules/storage.js';
 
 const PARENT_MENU_ID = 'custom-search-parent';
 
@@ -9,22 +9,34 @@ async function createContextMenu() {
   // Remove all existing menus first
   await chrome.contextMenus.removeAll();
 
-  // Create parent menu item
-  chrome.contextMenus.create({
-    id: PARENT_MENU_ID,
-    title: 'Search for "%s"',
-    contexts: ['selection']
-  });
-
-  // Get enabled search sites and create child menu items
+  const settings = await getSettings();
   const sites = await getEnabledSearchSites();
-  for (const site of sites) {
+
+  if (settings.useFlatMenu) {
+    // Flat mode: Each site as top-level menu item
+    for (const site of sites) {
+      chrome.contextMenus.create({
+        id: site.id,
+        title: `Search ${site.name} for "%s"`,
+        contexts: ['selection']
+      });
+    }
+  } else {
+    // Nested mode: Sites under parent menu
     chrome.contextMenus.create({
-      id: site.id,
-      parentId: PARENT_MENU_ID,
-      title: site.name,
+      id: PARENT_MENU_ID,
+      title: 'Search for "%s"',
       contexts: ['selection']
     });
+
+    for (const site of sites) {
+      chrome.contextMenus.create({
+        id: site.id,
+        parentId: PARENT_MENU_ID,
+        title: site.name,
+        contexts: ['selection']
+      });
+    }
   }
 }
 
@@ -32,7 +44,10 @@ async function createContextMenu() {
  * Handle context menu click
  */
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
-  if (info.parentMenuItemId !== PARENT_MENU_ID) return;
+  const settings = await getSettings();
+
+  // In flat mode, items have no parent. In nested mode, check parent.
+  if (!settings.useFlatMenu && info.parentMenuItemId !== PARENT_MENU_ID) return;
 
   const sites = await getEnabledSearchSites();
   const site = sites.find(s => s.id === info.menuItemId);
@@ -56,7 +71,7 @@ chrome.runtime.onInstalled.addListener(async () => {
  * Rebuild context menu when storage changes
  */
 chrome.storage.onChanged.addListener((changes, areaName) => {
-  if (areaName === 'sync' && changes.searchSites) {
+  if (areaName === 'sync' && (changes.searchSites || changes.settings)) {
     createContextMenu();
   }
 });
