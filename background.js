@@ -1,6 +1,6 @@
 import { initializeStorage, getEnabledSearchSites } from './modules/storage.js';
+import { PARENT_MENU_ID } from './modules/config.js';
 
-const PARENT_MENU_ID = 'custom-search-parent';
 let isCreatingMenu = false;
 let createMenuTimeout = null;
 
@@ -86,7 +86,7 @@ chrome.contextMenus.onClicked.addListener(async (info) => {
     if (site && info.selectionText) {
       const searchText = encodeURIComponent(info.selectionText);
       const searchUrl = site.url.replace('%s', searchText);
-      chrome.tabs.create({ url: searchUrl }, (tab) => {
+      chrome.tabs.create({ url: searchUrl }, () => {
         if (chrome.runtime.lastError) {
           console.error('Failed to open search tab:', chrome.runtime.lastError);
         }
