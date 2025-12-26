@@ -153,17 +153,21 @@ def create_store_image(screenshot_path, output_path, annotation=None, annotation
     if annotation:
         draw = ImageDraw.Draw(background)
 
-        # Load fonts
+        # Load fonts - using Bahnschrift for modern, geometric look
         try:
-            title_font = ImageFont.truetype("segoeui.ttf", 42)
-            subtitle_font = ImageFont.truetype("segoeui.ttf", 24)
+            title_font = ImageFont.truetype("bahnschrift.ttf", 44)
+            subtitle_font = ImageFont.truetype("bahnschrift.ttf", 24)
         except:
             try:
-                title_font = ImageFont.truetype("arial.ttf", 42)
-                subtitle_font = ImageFont.truetype("arial.ttf", 24)
+                title_font = ImageFont.truetype("segoeui.ttf", 42)
+                subtitle_font = ImageFont.truetype("segoeui.ttf", 24)
             except:
-                title_font = ImageFont.load_default()
-                subtitle_font = ImageFont.load_default()
+                try:
+                    title_font = ImageFont.truetype("arial.ttf", 42)
+                    subtitle_font = ImageFont.truetype("arial.ttf", 24)
+                except:
+                    title_font = ImageFont.load_default()
+                    subtitle_font = ImageFont.load_default()
 
         # Parse annotation (title and optional subtitle)
         if isinstance(annotation, dict):
