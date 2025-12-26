@@ -1,7 +1,6 @@
 import { DEFAULT_SEARCH_SITES } from './defaults.js';
 
 const STORAGE_KEY = 'searchSites';
-const SETTINGS_KEY = 'settings';
 
 /**
  * Get all search sites from storage
@@ -102,32 +101,4 @@ export async function getEnabledSearchSites() {
   return sites
     .filter(site => site.enabled)
     .sort((a, b) => a.order - b.order);
-}
-
-/**
- * Get settings from storage
- * @returns {Promise<Object>} Settings object
- */
-export async function getSettings() {
-  try {
-    const result = await chrome.storage.sync.get(SETTINGS_KEY);
-    return result[SETTINGS_KEY] || { useFlatMenu: false };
-  } catch (error) {
-    console.error('Error getting settings:', error);
-    return { useFlatMenu: false };
-  }
-}
-
-/**
- * Update settings in storage
- * @param {Object} settings - Settings to save
- * @returns {Promise<void>}
- */
-export async function saveSettings(settings) {
-  try {
-    await chrome.storage.sync.set({ [SETTINGS_KEY]: settings });
-  } catch (error) {
-    console.error('Error saving settings:', error);
-    throw error;
-  }
 }
