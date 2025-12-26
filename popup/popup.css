@@ -74,6 +74,12 @@ body {
   background: #202124;
 }
 
+.info-icon:focus-visible {
+  outline: 2px solid #1a73e8;
+  outline-offset: 2px;
+  background: #202124;
+}
+
 .tooltip {
   visibility: hidden;
   opacity: 0;
@@ -103,7 +109,9 @@ body {
   border-bottom-color: #202124;
 }
 
-.tooltip-container:hover .tooltip {
+.tooltip-container:hover .tooltip,
+.tooltip-container:focus-within .tooltip,
+.tooltip.visible {
   visibility: visible;
   opacity: 1;
 }
@@ -125,6 +133,11 @@ body {
 
 .btn-icon:hover {
   background: #1557b0;
+}
+
+.btn-icon:focus-visible {
+  outline: 2px solid #1a73e8;
+  outline-offset: 2px;
 }
 
 /* Settings Section */
@@ -265,6 +278,11 @@ body {
   transform: translateX(16px);
 }
 
+.toggle input:focus-visible + .toggle-slider {
+  outline: 2px solid #1a73e8;
+  outline-offset: 2px;
+}
+
 /* Action Buttons */
 .btn-action {
   width: 24px;
@@ -299,6 +317,11 @@ body {
 .btn-action:disabled:hover {
   background: transparent;
   color: #5f6368;
+}
+
+.btn-action:focus-visible {
+  outline: 2px solid #1a73e8;
+  outline-offset: 2px;
 }
 
 /* Empty State */
@@ -417,6 +440,11 @@ body {
   background: #1557b0;
 }
 
+.btn-primary:focus-visible {
+  outline: 2px solid #1a73e8;
+  outline-offset: 2px;
+}
+
 .btn-secondary {
   background: white;
   color: #1a73e8;
@@ -425,6 +453,11 @@ body {
 
 .btn-secondary:hover {
   background: #f8f9fa;
+}
+
+.btn-secondary:focus-visible {
+  outline: 2px solid #1a73e8;
+  outline-offset: 2px;
 }
 
 /* Utilities */
